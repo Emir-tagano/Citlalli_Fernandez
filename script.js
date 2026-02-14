@@ -1,31 +1,33 @@
-// --- Setup and Variables ---
+// --- Setup and Constants ---
 const anniversaryDate = new Date('2022-11-16T19:10:00');
 const introOverlay = document.getElementById('intro-overlay');
 const mainContent = document.getElementById('main-content');
 const btnNo = document.getElementById('btn-no');
 const btnYes = document.getElementById('btn-yes');
 const bgMusic = document.getElementById('bg-music');
+const momentsContainer = document.querySelector('.moment-cards');
 
-function createHeart() {
-    const heart = document.createElement('div');
-    heart.className = 'heart-particle';
-    heart.innerHTML = '❤️';
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.setProperty('--randX', (Math.random() * 200 - 100) + 'px');
-    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 5000);
+// --- Intro Logic (No Button) ---
+btnNo.addEventListener('touchstart', moveNoBtn);
+btnNo.addEventListener('mouseover', moveNoBtn);
+
+function moveNoBtn(e) {
+    const container = document.getElementById('btn-hitbox');
+    const rect = container.getBoundingClientRect();
+
+    // Stay within the parent container (hitbox) to avoid escaping screen
+    const maxX = rect.width - btnNo.offsetWidth;
+    const maxY = rect.height - btnNo.offsetHeight;
+
+    const newX = Math.random() * maxX;
+    const newY = Math.random() * maxY;
+
+    btnNo.style.position = 'absolute';
+    btnNo.style.left = `${newX}px`;
+    btnNo.style.top = `${newY}px`;
+
+    if (e.cancelable) e.preventDefault();
 }
-setInterval(createHeart, 800);
-
-// --- Intro Logic ---
-btnNo.addEventListener('mouseover', () => {
-    const x = Math.random() * (window.innerWidth - btnNo.offsetWidth);
-    const y = Math.random() * (window.innerHeight - btnNo.offsetHeight);
-    btnNo.style.position = 'fixed';
-    btnNo.style.left = `${x}px`;
-    btnNo.style.top = `${y}px`;
-});
 
 btnYes.addEventListener('click', () => {
     introOverlay.style.opacity = '0';
@@ -34,40 +36,32 @@ btnYes.addEventListener('click', () => {
         mainContent.classList.remove('hidden');
         startCounter();
         initTypewriter();
-        initGallery();
-        bgMusic.play().catch(e => console.log("Music play blocked", e));
+        initMoments();
+        bgMusic.play().catch(e => console.log("Music blocked", e));
         revealSections();
+        drawBouquetAnimated();
     }, 1000);
 });
 
 // --- Counter Logic ---
 function startCounter() {
-    function update() {
-        const now = new Date();
-        const diff = now - anniversaryDate;
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diff / (1000 * 60)) % 60);
-        const seconds = Math.floor((diff / 1000) % 60);
-
-        document.getElementById('days').textContent = days.toString().padStart(2, '0');
-        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-    }
-    update();
-    setInterval(update, 1000);
+    setInterval(() => {
+        const diff = new Date() - anniversaryDate;
+        document.getElementById('days').textContent = Math.floor(diff / 86400000);
+        document.getElementById('hours').textContent = Math.floor((diff / 3600000) % 24).toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = Math.floor((diff / 60000) % 60).toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+    }, 1000);
 }
 
 // --- Typewriter Logic ---
 function initTypewriter() {
-    const text = "Hola mi amor, Citlalli... Sabes, hoy es un día especial, pero para mí, todos los días lo son si estoy a tu lado. Llevamos más de 3 años construyendo algo hermoso. Eres mi niña buena, mi hogar, y aunque a veces seas un poco enojona, te amo tal cual eres. Quiero que sepas que a pesar de todo lo que hemos pasado, mi amor por ti solo crece. Mira lo que he preparado para ti...";
-    const typewriter = document.getElementById('typewriter');
+    const text = "Citlalli, eres lo mejor que me ha pasado. Estos 3 años y 2 meses han sido una aventura increíble. Gracias por ser mi hogar, mi calma y mi mayor alegría. Te amo por lo que eres, por cómo me cuidas y por cómo caminamos juntos. Aquí te comparto un poquito de nosotros...";
+    const el = document.getElementById('typewriter');
     let i = 0;
     function type() {
         if (i < text.length) {
-            typewriter.textContent += text.charAt(i);
+            el.textContent += text.charAt(i);
             i++;
             setTimeout(type, 50);
         }
@@ -75,293 +69,269 @@ function initTypewriter() {
     type();
 }
 
+// --- Moments Logic ---
+const momentsData = [
+    { img: "20221115_135616.jpg", phrase: "Si pudiera elegir un lugar seguro, sería a tu lado." },
+    { img: "20230502_172836.jpg", phrase: "Te miro y me doy cuenta que jamás pensé que podría amar a alguien con tanta intensidad..." },
+    { img: "20240318_143855.jpg", phrase: "Encontré el amor y la calma que tanto necesitaba, y encontré mi hogar en unos brazos que desde hace tiempo anhelaba." },
+    { img: "20251116_160315.jpg", phrase: "A pesar de todo lo que hemos pasado y vivido, yo te seguiré amando siempre." }
+];
+
+function initMoments() {
+    momentsData.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'moment-card';
+        card.innerHTML = `
+            <img src="Imagenes_Citla/${m.img}" loading="lazy">
+            <div class="phrase">${m.phrase}</div>
+        `;
+        momentsContainer.appendChild(card);
+    });
+}
+
+// --- Flower Bouquet Animated ---
+async function drawBouquetAnimated() {
+    const container = document.getElementById('flower-bouquet');
+    const svgHeader = `<svg viewBox="0 0 400 400" width="100%" height="100%"><defs>
+        <radialGradient id="gradRan"><stop offset="0%" stop-color="#800020"/><stop offset="100%" stop-color="#641e16"/></radialGradient>
+        <radialGradient id="gradLily"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#f5f5dc"/></radialGradient>
+    </defs>`;
+
+    container.innerHTML = svgHeader + `</svg>`;
+    const svg = container.querySelector('svg');
+
+    const addElem = (html) => {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.innerHTML = html;
+        g.style.opacity = "0";
+        g.style.transition = "opacity 1s";
+        svg.appendChild(g);
+        setTimeout(() => g.style.opacity = "1", 50);
+    };
+
+    // Stems first
+    addElem(`<path d="M200,400 Q180,300 150,250" stroke="#556b2f" stroke-width="3" fill="none" />`);
+    await sleep(500);
+    addElem(`<path d="M200,400 Q200,300 200,220" stroke="#556b2f" stroke-width="3" fill="none" />`);
+    await sleep(500);
+    addElem(`<path d="M200,400 Q220,300 250,250" stroke="#556b2f" stroke-width="3" fill="none" />`);
+
+    // Petals one by one
+    for (let i = 0; i < 8; i++) {
+        addElem(`<ellipse cx="150" cy="270" rx="15" ry="25" fill="#fdfdfd" transform="rotate(${i * 45} 150 250)" opacity="0.9" />`);
+        await sleep(300);
+    }
+    addElem(`<circle cx="150" cy="250" r="8" fill="#1b2631" />`);
+
+    await sleep(500);
+    addElem(`<path d="M200,220 Q220,180 200,140 Q180,180 200,220" fill="url(#gradLily)" />`);
+    addElem(`<path d="M200,220 Q240,200 280,180 Q240,220 200,220" fill="url(#gradLily)" />`);
+    addElem(`<path d="M200,220 Q160,200 120,180 Q160,220 200,220" fill="url(#gradLily)" />`);
+
+    for (let i = 0; i < 10; i++) {
+        addElem(`<circle cx="250" cy="${250 + i}" r="${25 - i * 2}" fill="url(#gradRan)" />`);
+        await sleep(200);
+    }
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 // --- Scroll Reveal ---
 function revealSections() {
-    const sections = document.querySelectorAll('.section');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                if (entry.target.id === 'letter-section') {
-                    showScrollMessages();
-                }
-            }
+            if (entry.isIntersecting) entry.target.classList.add('visible');
         });
     }, { threshold: 0.1 });
-
-    sections.forEach(section => observer.observe(section));
+    document.querySelectorAll('.section').forEach(s => observer.observe(s));
 }
 
-function showScrollMessages() {
-    const msgs = document.querySelectorAll('.scroll-msg');
-    msgs.forEach((msg, idx) => {
-        setTimeout(() => {
-            msg.classList.add('show');
-        }, idx * 2000);
-    });
-}
-
-// --- Gallery Logic ---
-const images = [
-    "20221115_135616.jpg", "20230502_172836.jpg", "20240318_143855.jpg",
-    "20251116_160315.jpg", "20221121_113007.jpg", "20230803_183627.jpg",
-    "20240309_195528.jpg", "20250125_125651.jpg", "20231118_205821.jpg",
-    "20240103_143456.jpg", "20240608_165005.jpg", "20250730_231856.jpg"
-];
-
-function initGallery() {
-    const gallery = document.getElementById('image-gallery');
-    images.forEach(img => {
-        const div = document.createElement('div');
-        div.className = 'gallery-item';
-        div.innerHTML = `<img src="Imagenes_Citla/${img}" alt="Momento">`;
-        gallery.appendChild(div);
-    });
-}
-
-// --- Gift Card Logic ---
-const gifts = [
-    "Viaje a la playa", "Vuelo en Helicóptero", "Cena Romántica Chef Privado",
-    "Escapada a un Pueblo Mágico", "Día de Spa Completo", "Organizaré todo un viaje sorpresa",
-    "Tour de Jaguares y Naturaleza", "Noche en un Hotel de Lujo"
-];
-
+// --- Gift Logic ---
+const gifts = ["Picnic en la naturaleza", "Ver el atardecer juntos", "Una carta escrita a mano", "Cena preparada por mí", "Un día de museos", "Playlist personalizada", "Masaje relajante", "Cita sorpresa"];
 const giftGrid = document.getElementById('gift-grid');
 let giftChosen = false;
 
 function initGifts() {
-    const shuffled = [...gifts].sort(() => Math.random() - 0.5);
-    shuffled.forEach((gift, idx) => {
+    [...gifts].sort(() => Math.random() - 0.5).forEach(gift => {
         const card = document.createElement('div');
         card.className = 'gift-card';
-        card.innerHTML = `
-            <div class="gift-card-inner">
-                <div class="gift-card-front">🎁</div>
-                <div class="gift-card-back">${gift}</div>
-            </div>
-        `;
-        card.addEventListener('click', () => {
+        card.innerHTML = `<div class="gift-card-inner"><div class="gift-card-front">🎁</div><div class="gift-card-back">${gift}</div></div>`;
+        card.onclick = () => {
             if (!giftChosen) {
                 card.classList.add('flipped');
                 giftChosen = true;
                 document.getElementById('gift-reveal').classList.remove('hidden');
-                document.getElementById('selected-gift-text').textContent = `Tu destino es: ${gift}. ¡Es una promesa!`;
-                // Flip others after a delay to show what they were
-                setTimeout(() => {
-                    document.querySelectorAll('.gift-card').forEach(c => c.classList.add('flipped'));
-                }, 1000);
+                document.getElementById('selected-gift-text').textContent = gift;
+                setTimeout(() => document.querySelectorAll('.gift-card').forEach(c => c.classList.add('flipped')), 1000);
             }
-        });
+        };
         giftGrid.appendChild(card);
     });
 }
 initGifts();
 
-// --- Flower Bouquet SVG ---
-function drawBouquet() {
-    const container = document.getElementById('flower-bouquet');
-    const svg = `
-    <svg viewBox="0 0 400 400" width="100%" height="100%">
-        <defs>
-            <radialGradient id="gradRan" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#800020;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#641e16;stop-opacity:1" />
-            </radialGradient>
-            <radialGradient id="gradLily" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#f4ece1;stop-opacity:1" />
-            </radialGradient>
-        </defs>
-        <!-- Stems -->
-        <g class="stems">
-            <path d="M200,400 Q180,300 150,250" stroke="#556b2f" stroke-width="3" fill="none" />
-            <path d="M200,400 Q200,300 200,220" stroke="#556b2f" stroke-width="3" fill="none" />
-            <path d="M200,400 Q220,300 250,250" stroke="#556b2f" stroke-width="3" fill="none" />
-        </g>
-        
-        <!-- Anemones (Blueish/White) -->
-        <g transform="translate(150, 250)" class="flower">
-            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="5 0 0" dur="3s" repeatCount="indefinite" additive="sum" />
-            ${Array.from({ length: 8 }).map((_, i) => `<ellipse cx="0" cy="20" rx="15" ry="25" fill="#fdfdfd" transform="rotate(${i * 45})" opacity="0.9" stroke="#ccc" stroke-width="0.5" />`).join('')}
-            <circle cx="0" cy="0" r="8" fill="#1b2631" />
-        </g>
-        
-        <!-- Lilies (White/Elegance) -->
-        <g transform="translate(200, 220)" class="flower">
-            <animateTransform attributeName="transform" type="translate" values="0,0; 0,-5; 0,0" dur="4s" repeatCount="indefinite" />
-            <path d="M0,0 Q20,-40 0,-80 Q-20,-40 0,0" fill="url(#gradLily)" stroke="#ddd" />
-            <path d="M0,0 Q40,-20 80,-40 Q40,0 0,0" fill="url(#gradLily)" transform="rotate(30)" stroke="#ddd" />
-            <path d="M0,0 Q-40,-20 -80,-40 Q-40,0 0,0" fill="url(#gradLily)" transform="rotate(-30)" stroke="#ddd" />
-            <circle cx="0" cy="-20" r="5" fill="#c5a059" />
-        </g>
-        
-        <!-- Ranunculus (Wine Color) -->
-        <g transform="translate(250, 250)" class="flower">
-            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="-5 0 0" dur="5s" repeatCount="indefinite" additive="sum" />
-            ${Array.from({ length: 15 }).map((_, i) => `<circle cx="0" cy="${2 + i / 2}" r="${30 - i * 1.8}" fill="url(#gradRan)" opacity="${1 - i * 0.02}" stroke="#441111" stroke-width="0.2" />`).join('')}
-        </g>
-        
-        <!-- Leaves -->
-        <path d="M200,350 Q150,340 130,370 Q150,380 200,350" fill="#556b2f" opacity="0.8" />
-        <path d="M200,350 Q250,340 270,370 Q250,380 200,350" fill="#556b2f" opacity="0.8" />
-    </svg>`;
-    container.innerHTML = svg;
-}
-drawBouquet();
-
-// --- Turtle Game Logic ---
+// --- 2D Platformer Game Logic ---
 const canvas = document.getElementById('turtle-canvas');
 const ctx = canvas.getContext('2d');
-const startBtn = document.getElementById('start-game-btn');
-const gameContainer = document.getElementById('game-container');
-const gameStory = document.getElementById('game-story');
-const gameOverlay = document.getElementById('game-overlay');
-const gameMsg = document.getElementById('game-msg');
+let gameActive = false;
+let currentLevel = 0;
 
-const storyChunks = [
-    "Había una vez una tortuguita verde marina.",
-    "No era la más rápida…",
-    "pero cuando se proponía algo, nunca se rinde.",
-    "Un día, el corazón más importante se perdió.",
-    "Y decidió ir a buscarlo."
+const levels = [
+    { title: "Nivel 1: La Rutina", obstacles: ["Rutina", "Cansancio"], goal: 2000, msg: "Nada importante se construye en un día." },
+    { title: "Nivel 2: Los Desafíos", obstacles: ["Distancia", "Malentendidos"], goal: 2500, msg: "Entendernos toma esfuerzo, pero vale la pena." },
+    { title: "Nivel 3: El Cuidado", obstacles: ["Orgullo", "Tiempo"], goal: 3000, msg: "Lo que se cuida, crece." },
+    { title: "Nivel 4: Nuestro Futuro", obstacles: ["Dudas", "Miedos"], goal: 3500, msg: "Siempre elegiré avanzar hacia ti." }
 ];
 
-let currentStoryIdx = 0;
-function showStory() {
-    if (currentStoryIdx < storyChunks.length) {
-        gameStory.textContent = storyChunks[currentStoryIdx];
-        currentStoryIdx++;
-        setTimeout(showStory, 3000);
-    } else {
-        startBtn.classList.remove('hidden');
+let player = { x: 100, y: 300, w: 60, h: 30, dy: 0, speed: 5, jump: -12, grounded: false };
+let camera = { x: 0 };
+let worldObstacles = [];
+
+function initLevel() {
+    player.x = 100;
+    camera.x = 0;
+    worldObstacles = [];
+    const lvl = levels[currentLevel];
+    document.getElementById('level-title').textContent = lvl.title;
+
+    for (let i = 1; i < 10; i++) {
+        worldObstacles.push({
+            x: 500 * i,
+            y: 350,
+            text: lvl.obstacles[Math.floor(Math.random() * lvl.obstacles.length)],
+            w: 100, h: 40
+        });
     }
-}
-showStory();
-
-let gameRunning = false;
-let turtle = { x: 50, y: 250, r: 20, speed: 4 };
-let heart = { x: 750, y: 250, r: 30 };
-let obstacles = [
-    { text: "Celos", x: 200, y: 100, vx: 0, vy: 2 },
-    { text: "Distancia", x: 400, y: 400, vx: 0, vy: -2 },
-    { text: "Tareas", x: 600, y: 200, vx: 0, vy: 3 },
-    { text: "Estrés", x: 300, y: 300, vx: 2, vy: 0 }
-];
-
-const keys = {};
-window.addEventListener('keydown', e => keys[e.key] = true);
-window.addEventListener('keyup', e => keys[e.key] = false);
-
-startBtn.addEventListener('click', () => {
-    gameContainer.classList.remove('hidden');
-    startBtn.classList.add('hidden');
-    gameRunning = true;
-    gameLoop();
-});
-
-function gameLoop() {
-    if (!gameRunning) return;
-    updateGame();
-    drawGame();
-    requestAnimationFrame(gameLoop);
 }
 
 function updateGame() {
-    if (keys['ArrowUp'] || keys['w']) turtle.y -= turtle.speed;
-    if (keys['ArrowDown'] || keys['s']) turtle.y += turtle.speed;
-    if (keys['ArrowLeft'] || keys['a']) turtle.x -= turtle.speed;
-    if (keys['ArrowRight'] || keys['d']) turtle.x += turtle.speed;
+    if (!gameActive) return;
 
-    // Constrain
-    turtle.x = Math.max(turtle.r, Math.min(800 - turtle.r, turtle.x));
-    turtle.y = Math.max(turtle.r, Math.min(500 - turtle.r, turtle.y));
+    // Movement
+    if (keys.right) player.x += player.speed;
+    if (keys.left) player.x -= player.speed;
+    if (keys.jump && player.grounded) {
+        player.dy = player.jump;
+        player.grounded = false;
+    }
 
-    // Move obstacles
-    obstacles.forEach(obs => {
-        obs.x += obs.vx;
-        obs.y += obs.vy;
-        if (obs.x < 0 || obs.x > 800) obs.vx *= -1;
-        if (obs.y < 0 || obs.y > 500) obs.vy *= -1;
+    // Gravity
+    player.dy += 0.6;
+    player.y += player.dy;
 
-        // Collision
-        let dx = turtle.x - obs.x;
-        let dy = turtle.y - (obs.y - 10);
-        let dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < turtle.r + 20) {
-            handleHit();
+    // Floor
+    if (player.y > 350) {
+        player.y = 350;
+        player.dy = 0;
+        player.grounded = true;
+    }
+
+    // Camera
+    camera.x = player.x - 200;
+
+    // Collisions
+    worldObstacles.forEach(obs => {
+        if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
+            player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+            player.x = 100; // Reset level
         }
     });
 
-    // Check Win
-    let dx = turtle.x - heart.x;
-    let dy = turtle.y - heart.y;
-    let dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < turtle.r + heart.r) {
-        handleWin();
+    // Check Win Level
+    if (player.x > levels[currentLevel].goal) {
+        showLevelMessage();
     }
 }
 
-function handleHit() {
-    gameRunning = false;
-    gameOverlay.classList.remove('hidden');
-    gameMsg.textContent = "Eso puede complicarnos… pero no detenernos.";
+function showLevelMessage() {
+    gameActive = false;
+    const msgEl = document.getElementById('level-msg');
+    msgEl.textContent = levels[currentLevel].msg;
+    msgEl.classList.remove('hidden');
+
     setTimeout(() => {
-        turtle.x = 50;
-        turtle.y = 250;
-        gameOverlay.classList.add('hidden');
-        gameRunning = true;
-        gameLoop();
-    }, 2000);
+        msgEl.classList.add('hidden');
+        currentLevel++;
+        if (currentLevel < levels.length) {
+            initLevel();
+            gameActive = true;
+        } else {
+            finishGame();
+        }
+    }, 3000);
 }
 
-function handleWin() {
-    gameRunning = false;
-    document.getElementById('final-message').classList.remove('hidden');
-    gameContainer.style.border = "5px solid var(--vino)";
-    // Animation for heart growth could go here
+function finishGame() {
+    document.getElementById('game-canvas-section').classList.add('hidden');
+    document.getElementById('final-love-section').classList.remove('hidden');
+    document.body.classList.remove('playing-game');
 }
 
 function drawGame() {
-    ctx.clearRect(0, 0, 800, 500);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(-camera.x, 0);
 
-    // Draw Heart
-    ctx.fillStyle = "#ff4d4d";
-    ctx.beginPath();
-    ctx.arc(heart.x, heart.y, heart.r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "white";
-    ctx.font = "20px Montserrat";
-    ctx.fillText("❤️", heart.x - 12, heart.y + 8);
+    // Draw Floor
+    ctx.fillStyle = "#556b2f";
+    ctx.fillRect(camera.x, 380, canvas.width, 200);
 
-    // Draw Turtle (Pixar style simplified: Dark Green Shell, Light Green Body)
-    ctx.fillStyle = "#90EE90"; // Light green body
+    // Draw Turtle (Side View)
+    ctx.fillStyle = "#90EE90"; // Body
     ctx.beginPath();
-    ctx.arc(turtle.x, turtle.y, turtle.r, 0, Math.PI * 2);
+    ctx.ellipse(player.x + 30, player.y + 15, 30, 15, 0, 0, Math.PI * 2);
     ctx.fill();
-    // Shell
-    ctx.fillStyle = "#228B22"; // Dark green shell
+    ctx.fillStyle = "#228B22"; // Shell
     ctx.beginPath();
-    ctx.arc(turtle.x, turtle.y, turtle.r - 5, 0, Math.PI * 2);
+    ctx.ellipse(player.x + 25, player.y + 10, 25, 15, 0, 0, Math.PI * 2);
     ctx.fill();
-    // Head
-    ctx.fillStyle = "#90EE90";
+    ctx.fillStyle = "#90EE90"; // Head
     ctx.beginPath();
-    ctx.arc(turtle.x + 15, turtle.y - 5, 10, 0, Math.PI * 2);
-    ctx.fill();
-    // Eyes
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(turtle.x + 20, turtle.y - 7, 2, 0, Math.PI * 2);
+    ctx.arc(player.x + 60, player.y + 10, 8, 0, Math.PI * 2);
     ctx.fill();
 
     // Draw Obstacles
-    ctx.fillStyle = "white";
-    ctx.font = "bold 18px Montserrat";
-    obstacles.forEach(obs => {
-        ctx.fillText(obs.text, obs.x - 30, obs.y);
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.font = "16px Montserrat";
+    worldObstacles.forEach(obs => {
+        ctx.fillText(obs.text, obs.x, obs.y);
     });
+
+    // Goal
+    ctx.fillStyle = "#ff4d4d";
+    ctx.font = "40px Montserrat";
+    ctx.fillText("❤️", levels[currentLevel].goal, 350);
+
+    ctx.restore();
+    if (gameActive) requestAnimationFrame(drawGame);
 }
 
-// Adjust canvas size
-canvas.width = 800;
-canvas.height = 500;
+const keys = { left: false, right: false, jump: false };
+document.getElementById('btn-left').ontouchstart = () => keys.left = true;
+document.getElementById('btn-left').ontouchend = () => keys.left = false;
+document.getElementById('btn-right').ontouchstart = () => keys.right = true;
+document.getElementById('btn-right').ontouchend = () => keys.right = false;
+document.getElementById('btn-jump').ontouchstart = () => keys.jump = true;
+document.getElementById('btn-jump').ontouchend = () => keys.jump = false;
+
+document.getElementById('start-game-btn').onclick = () => {
+    document.getElementById('game-canvas-section').classList.remove('hidden');
+    document.body.classList.add('playing-game');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gameActive = true;
+    initLevel();
+    drawGame();
+    setInterval(updateGame, 1000 / 60);
+};
+
+// Hearts Background
+setInterval(() => {
+    const h = document.createElement('div');
+    h.className = 'heart-particle';
+    h.innerHTML = '❤️';
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.setProperty('--randX', (Math.random() * 200 - 100) + 'px');
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 4000);
+}, 1000);

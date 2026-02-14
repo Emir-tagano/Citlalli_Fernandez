@@ -3,23 +3,50 @@
     --midnight: #1b2631;
     --olive: #556b2f;
     --gold: #c5a059;
-    --cream: #f4ece1;
+    --beige: #f5f5dc;
+    --cream: #fffaf0;
+    --text-dark: #2c3e50;
     --text-light: #fdfdfd;
-    --glass: rgba(255, 255, 255, 0.1);
+    --glass: rgba(255, 255, 255, 0.2);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: var(--midnight);
-    color: var(--text-light);
+    background-color: var(--beige);
+    color: var(--text-dark);
     font-family: 'Montserrat', sans-serif;
     overflow-x: hidden;
     line-height: 1.6;
+}
+
+/* Orientation Lock Message */
+#orientation-message {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--midnight);
+    color: white;
+    z-index: 2000;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+    body.playing-game #orientation-message {
+        display: flex;
+    }
 }
 
 .dancing-script {
@@ -29,11 +56,6 @@ body {
 
 .playfair {
     font-family: 'Playfair Display', serif;
-}
-
-.playfair-italic {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
 }
 
 .hidden {
@@ -47,7 +69,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, var(--vino), var(--midnight));
+    background: var(--vino);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -58,48 +80,44 @@ body {
 .intro-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
-    padding: 3rem;
+    padding: 2rem;
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     max-width: 90%;
 }
 
 .intro-card h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
     color: var(--gold);
 }
 
-.intro-card p {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-}
-
 .btn-container {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
     position: relative;
-    height: 60px;
+    width: 100%;
+    height: 200px;
 }
 
 .btn {
-    padding: 1rem 2.5rem;
+    padding: 0.8rem 2rem;
     font-size: 1.1rem;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
 }
 
 #btn-yes {
-    background: var(--vino);
-    color: white;
-    box-shadow: 0 4px 15px rgba(100, 30, 22, 0.4);
+    background: white;
+    color: var(--vino);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #btn-yes:hover {
@@ -108,17 +126,20 @@ body {
 }
 
 .no-btn {
-    background: #444;
-    color: #ccc;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
     position: absolute;
-    left: 50%;
-    transform: translateX(20px);
+    width: 100px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Sections */
 .section {
     min-height: 100vh;
-    padding: 5rem 2rem;
+    padding: 5rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -126,6 +147,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
     transition: all 1s ease-out;
+    width: 100%;
 }
 
 .section.visible {
@@ -135,14 +157,14 @@ body {
 
 /* Hero & Counter */
 #hero {
-    background: linear-gradient(to bottom, var(--midnight), #0d1b2a);
+    background-color: var(--beige);
 }
 
 .bouquet-container {
     width: 100%;
-    max-width: 600px;
-    height: 400px;
-    margin-bottom: 3rem;
+    max-width: 400px;
+    height: 350px;
+    margin-bottom: 2rem;
 }
 
 .hero-text h2 {
@@ -152,36 +174,32 @@ body {
 }
 
 .counter-container {
-    margin-top: 3rem;
+    margin-top: 2rem;
     text-align: center;
-    background: var(--glass);
-    padding: 2rem;
-    border-radius: 20px;
-    backdrop-filter: blur(5px);
 }
 
 .timer {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
+    gap: 1rem;
 }
 
 .time-block {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 60px;
 }
 
 .time-block span {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: var(--gold);
+    color: var(--vino);
 }
 
 .time-block small {
     text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+    font-size: 0.6rem;
+    color: var(--text-dark);
 }
 
 /* Letter Card */
@@ -198,10 +216,43 @@ body {
     background-size: 20px 20px;
 }
 
+/* Typewriter & Moments */
 .typewriter-text {
+    font-size: 1.3rem;
+    text-align: center;
+    max-width: 600px;
+    margin-bottom: 4rem;
+    padding: 0 1rem;
+}
+
+.moment-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.moment-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+}
+
+.moment-card img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.moment-card .phrase {
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
-    margin-bottom: 2rem;
-    min-height: 100px;
+    color: var(--vino);
 }
 
 /* Scroll Messages */
@@ -230,11 +281,11 @@ body {
 }
 
 .video-container {
-    max-width: 800px;
     width: 100%;
-    border-radius: 20px;
+    max-width: 500px;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     border: 3px solid var(--vino);
 }
 
@@ -261,19 +312,19 @@ body {
 /* Love List Cards */
 .love-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     width: 100%;
-    max-width: 1000px;
+    max-width: 400px;
 }
 
 .love-card {
-    background: var(--glass);
-    padding: 2rem;
+    background: var(--cream);
+    padding: 1.5rem;
     border-radius: 15px;
-    border-bottom: 3px solid var(--olive);
+    border-left: 5px solid var(--olive);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
     text-align: center;
-    transition: transform 0.3s;
 }
 
 .love-card:hover {
@@ -284,14 +335,14 @@ body {
 /* Gift Cards */
 .gift-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-    margin-top: 3rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 400px;
 }
 
 .gift-card {
-    width: 150px;
-    height: 200px;
+    width: 140px;
+    height: 180px;
     perspective: 1000px;
     cursor: pointer;
 }
@@ -300,7 +351,6 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    text-align: center;
     transition: transform 0.6s;
     transform-style: preserve-3d;
 }
@@ -315,46 +365,126 @@ body {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    padding: 10px;
+    padding: 1rem;
+    text-align: center;
 }
 
 .gift-card-front {
     background: var(--vino);
     color: var(--gold);
-    font-size: 3rem;
-    border: 2px solid var(--gold);
+    font-size: 2.5rem;
 }
 
 .gift-card-back {
     background: var(--gold);
-    color: var(--vino);
+    color: white;
     transform: rotateY(180deg);
-    font-weight: bold;
+    font-weight: 600;
     font-size: 0.9rem;
 }
 
-/* Game Canvas */
-#game-container {
-    width: 100%;
-    max-width: 800px;
-    height: 500px;
-    background: linear-gradient(to bottom, #1B2631, #212F3D);
-    border-radius: 20px;
-    position: relative;
-    border: 5px solid var(--olive);
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(85, 107, 47, 0.3);
+/* Game Styles */
+#game-canvas-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--midnight);
+    z-index: 1500;
 }
 
-/* Floating Hearts */
+#inner-game-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+#turtle-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#game-ui {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    color: white;
+}
+
+#level-title {
+    font-size: 1.5rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+#level-msg {
+    margin-top: 10px;
+    background: var(--vino);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#game-controls {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    pointer-events: none;
+}
+
+.ctrl-btn {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 2rem;
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Final Section */
+.final-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.heart-big {
+    font-size: 5rem;
+    animation: pulse 1s infinite alternate;
+    margin-top: 2rem;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.2);
+    }
+}
+
+/* Hearts Particle */
 .heart-particle {
     position: fixed;
-    color: var(--vino);
-    font-size: 1.5rem;
     pointer-events: none;
     z-index: 1001;
     animation: floatUp 4s linear forwards;
@@ -376,22 +506,6 @@ body {
     }
 }
 
-#turtle-canvas {
-    width: 100%;
-    height: 100%;
-}
-
-.game-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
-    padding: 2rem;
-    border-radius: 15px;
-    text-align: center;
-}
-
 @media (max-width: 768px) {
     .gift-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -407,5 +521,13 @@ body {
 
     .timer {
         gap: 0.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .moment-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        max-width: 1200px;
     }
 }
