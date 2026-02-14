@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Para mi Niña Hermosa - Citlalli</title>
+    <title>Para Citlalli Fernandez Ventura</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,42 +13,38 @@
         rel="stylesheet">
 </head>
 
-<body class="mobile-optimized">
+<body>
     <div id="orientation-message">
-        <div class="rotate-icon">🔄</div>
-        <p class="playfair">Por favor, gira tu celular para jugar.</p>
-        <p><small>Este juego está diseñado para verse en horizontal.</small></p>
+        <p class="playfair">Gira tu celular para jugar</p>
     </div>
 
-    <!-- Background Music -->
     <audio id="bg-music" loop>
         <source src="audio.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Initial Question Overlay -->
+    <!-- Intro -->
     <div id="intro-overlay" class="overlay">
         <div class="intro-card">
-            <h1 class="dancing-script">Hola, mi vida...</h1>
-            <p class="playfair" style="color: white; margin-bottom: 2rem;">¿Quieres ser mi San Valentín?</p>
+            <h1 class="dancing-script">Citlalli</h1>
+            <p class="playfair" style="color: white; margin-bottom: 2rem;">¿Quieres ser mi San Valentin?</p>
             <div id="btn-hitbox" class="btn-container">
-                <button id="btn-yes" class="btn">¡Sí! ❤️</button>
-                <button id="btn-no" class="btn no-btn">No 💔</button>
+                <button id="btn-yes" class="btn">Si</button>
+                <button id="btn-no" class="btn no-btn">No</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
     <main id="main-content" class="hidden">
-        <!-- Section 1: Hero & Animated Bouquet -->
+        <!-- Section 1: Hero & Real Bouquet -->
         <section id="hero" class="section">
             <div class="bouquet-container">
                 <div id="flower-bouquet"></div>
             </div>
             <div class="hero-text">
-                <h2 class="dancing-script">Para Citlalli Fernandez Ventura</h2>
+                <h2 class="dancing-script" style="font-size: 3rem; color: var(--vino);">Te quiero mucho</h2>
                 <div id="counter" class="counter-container">
                     <div class="timer">
-                        <div class="time-block"><span id="days">00</span><small>Días</small></div>
+                        <div class="time-block"><span id="days">00</span><small>Dias</small></div>
                         <div class="time-block"><span id="hours">00</span><small>Horas</small></div>
                         <div class="time-block"><span id="minutes">00</span><small>Minutos</small></div>
                         <div class="time-block"><span id="seconds">00</span><small>Segundos</small></div>
@@ -57,30 +53,27 @@
             </div>
         </section>
 
-        <!-- Section 2: Story & Moments -->
-        <section id="moments-story" class="section">
+        <!-- Section 2: Personal Album -->
+        <section id="album-section" class="section">
             <div id="typewriter" class="typewriter-text playfair"></div>
-
-            <div class="moment-cards">
-                <!-- Moments will be injected here: Photo + Phrase -->
+            <div class="moment-cards" id="album-container">
+                <!-- 15+ photos will be here -->
             </div>
         </section>
 
-        <!-- Section 3: What I love about you -->
+        <!-- Section 3: 30 Things I Love (Interactive) -->
         <section id="love-list" class="section">
-            <h2 class="dancing-script" style="color: var(--vino); font-size: 3rem; margin-bottom: 2rem;">Lo que amo de
-                ti</h2>
-            <div class="love-cards">
-                <div class="love-card">Tu sonrisa que ilumina mi día.</div>
-                <div class="love-card">Tu inteligencia y la forma en que ves el mundo.</div>
-                <div class="love-card">Tu determinación y como nunca te rindes.</div>
-                <div class="love-card">Lo buena niña que eres conmigo.</div>
+            <h2 class="dancing-script" style="color: var(--vino); font-size: 3rem; margin-bottom: 2rem;">Cosas que amo
+                de ti</h2>
+            <div class="love-interactive-container" id="love-list-container">
+                <div id="love-item-display" class="love-card playfair">Toca para descubrir una de las 30 razones</div>
+                <button id="next-love-btn" class="btn"
+                    style="margin-top: 2rem; background: var(--vino); color: white;">Siguiente</button>
             </div>
         </section>
 
-        <!-- Section 4: Video Moment -->
+        <!-- Section 4: Video -->
         <section id="video-section" class="section">
-            <h2 class="playfair" style="margin-bottom: 2rem;">Un Recuerdo Especial</h2>
             <div class="video-container">
                 <video controls width="100%" poster="Imagenes_Citla/20260108_203722.jpg">
                     <source src="Imagenes_Citla/20260122_170710.mp4" type="video/mp4">
@@ -88,52 +81,37 @@
             </div>
         </section>
 
-        <!-- Section 5: The Gift Choice -->
+        <!-- Section 5: Original Rewards -->
         <section id="gift-section" class="section">
-            <h2 class="playfair">Elige una opción...</h2>
-            <p style="margin-bottom: 2rem; opacity: 0.7;">(Solo puedes escoger una carta)</p>
+            <h2 class="playfair">Elige una sorpresa</h2>
             <div class="gift-grid" id="gift-grid"></div>
             <div id="gift-reveal" class="hidden">
-                <h3 class="playfair">¡Has elegido! ✨</h3>
                 <p id="selected-gift-text" class="dancing-script" style="font-size: 2rem; color: var(--vino);"></p>
             </div>
         </section>
 
-        <!-- Section 6: The Turtle Game -->
+        <!-- Section 6: Mario Style Game -->
         <section id="game-intro-section" class="section">
-            <h2 class="dancing-script" style="font-size: 3.5rem; color: var(--olive);">Una pequeña aventura</h2>
-            <p class="playfair" style="max-width: 600px; text-align: center; margin-bottom: 2rem;">
-                Esta es la historia de alguien que, paso a paso, aprendió que lo más valioso requiere constancia.
-            </p>
-            <button id="start-game-btn" class="btn" style="background: var(--olive); color: white;">Empezar
-                Juego</button>
+            <h2 class="dancing-script" style="font-size: 3.5rem; color: var(--olive);">Una aventura para nosotros</h2>
+            <button id="start-game-btn" class="btn" style="background: var(--olive); color: white;">Jugar</button>
         </section>
 
         <section id="game-canvas-section" class="hidden">
             <div id="inner-game-container">
                 <div id="game-ui">
-                    <div id="level-title" class="playfair">Nivel 1: La Rutina</div>
-                    <div id="level-msg" class="hidden"></div>
+                    <div id="level-title" class="playfair">Nivel 1</div>
                 </div>
                 <canvas id="turtle-canvas"></canvas>
                 <div id="game-controls">
                     <button class="ctrl-btn" id="btn-left">◀</button>
-                    <button class="ctrl-btn" id="btn-jump">▲</button>
+                    <button class="ctrl-btn" id="btn-jump">JUMP</button>
                     <button class="ctrl-btn" id="btn-right">▶</button>
                 </div>
             </div>
         </section>
 
-        <section id="final-love-section" class="section hidden">
-            <div class="final-card">
-                <h2 class="dancing-script" style="font-size: 4rem; color: var(--vino);">Te amo Citlalli</h2>
-                <p class="playfair">No siempre será fácil. <br>Pero siempre elegiré avanzar hacia ti.</p>
-                <div class="heart-big">❤️</div>
-            </div>
-        </section>
-
-        <footer>
-            <p class="playfair">Con todo mi amor, Emir</p>
+        <footer style="padding: 4rem 1rem; text-align: center; background: var(--cream);">
+            <p class="playfair">Cada segundo contigo cuenta. Te amo.</p>
         </footer>
     </main>
 

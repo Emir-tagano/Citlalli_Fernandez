@@ -1,23 +1,19 @@
-// --- Setup and Constants ---
+// --- Setup ---
 const anniversaryDate = new Date('2022-11-16T19:10:00');
 const introOverlay = document.getElementById('intro-overlay');
 const mainContent = document.getElementById('main-content');
 const btnNo = document.getElementById('btn-no');
 const btnYes = document.getElementById('btn-yes');
 const bgMusic = document.getElementById('bg-music');
-const momentsContainer = document.querySelector('.moment-cards');
 
-// --- Intro Logic (No Button) ---
-btnNo.addEventListener('touchstart', moveNoBtn);
-btnNo.addEventListener('mouseover', moveNoBtn);
-
+// --- No Button Logic (Smooth and within bounds) ---
 function moveNoBtn(e) {
-    const container = document.getElementById('btn-hitbox');
-    const rect = container.getBoundingClientRect();
+    const hitbox = document.getElementById('btn-hitbox');
+    const rect = hitbox.getBoundingClientRect();
+    const btnRect = btnNo.getBoundingClientRect();
 
-    // Stay within the parent container (hitbox) to avoid escaping screen
-    const maxX = rect.width - btnNo.offsetWidth;
-    const maxY = rect.height - btnNo.offsetHeight;
+    const maxX = rect.width - btnRect.width;
+    const maxY = rect.height - btnRect.height;
 
     const newX = Math.random() * maxX;
     const newY = Math.random() * maxY;
@@ -26,8 +22,10 @@ function moveNoBtn(e) {
     btnNo.style.left = `${newX}px`;
     btnNo.style.top = `${newY}px`;
 
-    if (e.cancelable) e.preventDefault();
+    if (e) e.preventDefault();
 }
+btnNo.addEventListener('touchstart', moveNoBtn);
+btnNo.addEventListener('mouseover', moveNoBtn);
 
 btnYes.addEventListener('click', () => {
     introOverlay.style.opacity = '0';
@@ -36,14 +34,16 @@ btnYes.addEventListener('click', () => {
         mainContent.classList.remove('hidden');
         startCounter();
         initTypewriter();
-        initMoments();
-        bgMusic.play().catch(e => console.log("Music blocked", e));
+        initAlbum();
+        initLoveList();
+        initGifts();
+        renderBouquet();
+        bgMusic.play().catch(() => { });
         revealSections();
-        drawBouquetAnimated();
     }, 1000);
 });
 
-// --- Counter Logic ---
+// --- Counter ---
 function startCounter() {
     setInterval(() => {
         const diff = new Date() - anniversaryDate;
@@ -54,269 +54,222 @@ function startCounter() {
     }, 1000);
 }
 
-// --- Typewriter Logic ---
+// --- Typewriter (More Human) ---
 function initTypewriter() {
-    const text = "Citlalli, eres lo mejor que me ha pasado. Estos 3 años y 2 meses han sido una aventura increíble. Gracias por ser mi hogar, mi calma y mi mayor alegría. Te amo por lo que eres, por cómo me cuidas y por cómo caminamos juntos. Aquí te comparto un poquito de nosotros...";
+    const text = "Citla, no soy de muchas palabras, pero queria hacerte algo que pudieras guardar. Estos tres años han sido increibles a tu lado. Gracias por estar conmigo en las buenas y en las malas. Te quiero muchisimo y espero que esto te guste.";
     const el = document.getElementById('typewriter');
     let i = 0;
     function type() {
         if (i < text.length) {
             el.textContent += text.charAt(i);
             i++;
-            setTimeout(type, 50);
+            setTimeout(type, 60);
         }
     }
     type();
 }
 
-// --- Moments Logic ---
-const momentsData = [
-    { img: "20221115_135616.jpg", phrase: "Si pudiera elegir un lugar seguro, sería a tu lado." },
-    { img: "20230502_172836.jpg", phrase: "Te miro y me doy cuenta que jamás pensé que podría amar a alguien con tanta intensidad..." },
-    { img: "20240318_143855.jpg", phrase: "Encontré el amor y la calma que tanto necesitaba, y encontré mi hogar en unos brazos que desde hace tiempo anhelaba." },
-    { img: "20251116_160315.jpg", phrase: "A pesar de todo lo que hemos pasado y vivido, yo te seguiré amando siempre." }
-];
+// --- Professional SVG Bouquet ---
+function renderBouquet() {
+    const container = document.getElementById('flower-bouquet');
+    const svg = `
+    <svg viewBox="0 0 400 400" width="100%" height="100%">
+        <defs>
+            <radialGradient id="gradVino" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#800020"/><stop offset="100%" stop-color="#641e16"/>
+            </radialGradient>
+            <radialGradient id="gradCreme" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#f5f5dc"/>
+            </radialGradient>
+            <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3"/></filter>
+        </defs>
+        <!-- Stems -->
+        <g stroke="#556b2f" stroke-width="2.5" fill="none" class="stems">
+            <path d="M200,400 Q180,300 150,220" />
+            <path d="M200,400 Q200,300 200,180" />
+            <path d="M200,400 Q220,300 250,220" />
+        </g>
+        <!-- Ranunculus (Wine) -->
+        <g transform="translate(150, 220)" filter="url(#shadow)">
+            ${Array.from({ length: 12 }).map((_, i) => `<circle cx="0" cy="${i * 0.5}" r="${28 - i * 2}" fill="url(#gradVino)" />`).join('')}
+            <circle cx="0" cy="0" r="4" fill="#4a0f0a" />
+        </g>
+        <!-- Lily (Center White) -->
+        <g transform="translate(200, 180)" filter="url(#shadow)">
+            <path d="M0,0 Q30,-60 0,-120 Q-30,-60 0,0" fill="url(#gradCreme)" />
+            <path d="M0,0 Q60,-30 120,-60 Q60,0 0,0" fill="url(#gradCreme)" transform="rotate(40)" />
+            <path d="M0,0 Q-60,-30 -120,-60 Q-60,0 0,0" fill="url(#gradCreme)" transform="rotate(-40)" />
+            <circle cx="0" cy="-40" r="6" fill="#c5a059" />
+        </g>
+        <!-- Anemone (Blueish/Dark) -->
+        <g transform="translate(250, 220)" filter="url(#shadow)">
+            ${Array.from({ length: 8 }).map((_, i) => `<ellipse cx="0" cy="25" rx="15" ry="30" fill="#fdfdfd" transform="rotate(${i * 45})" opacity="0.95" />`).join('')}
+            <circle cx="0" cy="0" r="12" fill="#1b2631" />
+        </g>
+        <!-- Filler Flowers -->
+        <circle cx="170" cy="150" r="5" fill="#c5a059" />
+        <circle cx="230" cy="160" r="4" fill="#c5a059" />
+    </svg>`;
+    container.innerHTML = svg;
+}
 
-function initMoments() {
-    momentsData.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'moment-card';
-        card.innerHTML = `
-            <img src="Imagenes_Citla/${m.img}" loading="lazy">
-            <div class="phrase">${m.phrase}</div>
-        `;
-        momentsContainer.appendChild(card);
+// --- Album (Many photos) ---
+const photos = [
+    "20221115_135616.jpg", "20230502_172836.jpg", "20240318_143855.jpg", "20251116_160315.jpg",
+    "20221121_113007.jpg", "20230803_183627.jpg", "20240309_195528.jpg", "20250125_125651.jpg",
+    "20221217_140218.jpg", "20230127_190130.jpg", "20231118_205821.jpg", "20231216_220806.jpg",
+    "20240318_152746.jpg", "20240514_180943.jpg", "20240608_165005.jpg", "20250730_231856.jpg"
+];
+function initAlbum() {
+    const container = document.getElementById('album-container');
+    photos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'moment-card';
+        div.innerHTML = `<img src="Imagenes_Citla/${p}" loading="lazy">`;
+        container.appendChild(div);
     });
 }
 
-// --- Flower Bouquet Animated ---
-async function drawBouquetAnimated() {
-    const container = document.getElementById('flower-bouquet');
-    const svgHeader = `<svg viewBox="0 0 400 400" width="100%" height="100%"><defs>
-        <radialGradient id="gradRan"><stop offset="0%" stop-color="#800020"/><stop offset="100%" stop-color="#641e16"/></radialGradient>
-        <radialGradient id="gradLily"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#f5f5dc"/></radialGradient>
-    </defs>`;
-
-    container.innerHTML = svgHeader + `</svg>`;
-    const svg = container.querySelector('svg');
-
-    const addElem = (html) => {
-        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.innerHTML = html;
-        g.style.opacity = "0";
-        g.style.transition = "opacity 1s";
-        svg.appendChild(g);
-        setTimeout(() => g.style.opacity = "1", 50);
+// --- 30 Reasons ---
+const reasons = [
+    "Tu carisma que llena cualquier lugar.", "Tu mentalidad tan fuerte y madura.", "Tu sonrisa, que es mi parte favorita de ti.", "Como me haces sentir cuando estamos bien.",
+    "Tu inteligencia para resolver cualquier problema.", "Tu forma de cuidar a los animales.", "Tu paciencia (aunque a veces seas enojona).", "Lo linda que eres cuando te despiertas.",
+    "Tu determinacion para lograr tus metas.", "Como me escuchas cuando mas lo necesito.", "Tus abrazos que me dan paz.", "Tu estilo tan elegante y unico.",
+    "Lo trabajadora que eres.", "Que siempre buscas aprender algo nuevo.", "Tu risa que me contagia.", "Como me apoyas en mis locuras.",
+    "Tus ojos que brillan cuando hablas de lo que te gusta.", "Tu forma de caminar con tanta seguridad.", "Que eres mi mejor amiga ademas de mi novia.", "Nuestras platicas infinitas.",
+    "Los viajes que hemos hecho juntos.", "Lo bien que hueles siempre.", "Que nunca te rinder ante la adversidad.", "Como cuidas a tu familia.",
+    "Que eres una persona integra y honesta.", "Tu sentido del humor.", "Lo detallista que eres sin darte cuenta.", "Tu hogar que encontre en ti.",
+    "Que me haces querer ser una mejor version de mi.", "Simplemente, que eres tu."
+];
+let currentReason = 0;
+function initLoveList() {
+    const display = document.getElementById('love-item-display');
+    const btn = document.getElementById('next-love-btn');
+    btn.onclick = () => {
+        currentReason = (currentReason + 1) % reasons.length;
+        display.style.opacity = '0';
+        setTimeout(() => {
+            display.textContent = reasons[currentReason];
+            display.style.opacity = '1';
+        }, 300);
     };
-
-    // Stems first
-    addElem(`<path d="M200,400 Q180,300 150,250" stroke="#556b2f" stroke-width="3" fill="none" />`);
-    await sleep(500);
-    addElem(`<path d="M200,400 Q200,300 200,220" stroke="#556b2f" stroke-width="3" fill="none" />`);
-    await sleep(500);
-    addElem(`<path d="M200,400 Q220,300 250,250" stroke="#556b2f" stroke-width="3" fill="none" />`);
-
-    // Petals one by one
-    for (let i = 0; i < 8; i++) {
-        addElem(`<ellipse cx="150" cy="270" rx="15" ry="25" fill="#fdfdfd" transform="rotate(${i * 45} 150 250)" opacity="0.9" />`);
-        await sleep(300);
-    }
-    addElem(`<circle cx="150" cy="250" r="8" fill="#1b2631" />`);
-
-    await sleep(500);
-    addElem(`<path d="M200,220 Q220,180 200,140 Q180,180 200,220" fill="url(#gradLily)" />`);
-    addElem(`<path d="M200,220 Q240,200 280,180 Q240,220 200,220" fill="url(#gradLily)" />`);
-    addElem(`<path d="M200,220 Q160,200 120,180 Q160,220 200,220" fill="url(#gradLily)" />`);
-
-    for (let i = 0; i < 10; i++) {
-        addElem(`<circle cx="250" cy="${250 + i}" r="${25 - i * 2}" fill="url(#gradRan)" />`);
-        await sleep(200);
-    }
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-// --- Scroll Reveal ---
-function revealSections() {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('visible');
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.section').forEach(s => observer.observe(s));
-}
-
-// --- Gift Logic ---
-const gifts = ["Picnic en la naturaleza", "Ver el atardecer juntos", "Una carta escrita a mano", "Cena preparada por mí", "Un día de museos", "Playlist personalizada", "Masaje relajante", "Cita sorpresa"];
-const giftGrid = document.getElementById('gift-grid');
-let giftChosen = false;
-
+// --- Surprises ---
+const rewards = ["Escapada a un hotel boutique", "Masaje profesional en pareja", "Cena en el restaurante que tu elijas", "Vuelo en globo al amanecer", "Un dia de aventura sorpresa", "Cena romantica privada", "Un regalo sorpresa que te encantara", "Experiencia de spa premium"];
 function initGifts() {
-    [...gifts].sort(() => Math.random() - 0.5).forEach(gift => {
-        const card = document.createElement('div');
-        card.className = 'gift-card';
-        card.innerHTML = `<div class="gift-card-inner"><div class="gift-card-front">🎁</div><div class="gift-card-back">${gift}</div></div>`;
-        card.onclick = () => {
-            if (!giftChosen) {
-                card.classList.add('flipped');
-                giftChosen = true;
+    const grid = document.getElementById('gift-grid');
+    let chosen = false;
+    [...rewards].sort(() => Math.random() - 0.5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'gift-card';
+        div.innerHTML = `<div class="gift-card-inner"><div class="gift-card-front">?</div><div class="gift-card-back">${r}</div></div>`;
+        div.onclick = () => {
+            if (!chosen) {
+                div.classList.add('flipped');
+                chosen = true;
                 document.getElementById('gift-reveal').classList.remove('hidden');
-                document.getElementById('selected-gift-text').textContent = gift;
+                document.getElementById('selected-gift-text').textContent = "Tu sorpresa: " + r;
                 setTimeout(() => document.querySelectorAll('.gift-card').forEach(c => c.classList.add('flipped')), 1000);
             }
         };
-        giftGrid.appendChild(card);
+        grid.appendChild(div);
     });
 }
-initGifts();
 
-// --- 2D Platformer Game Logic ---
+// --- Mario Style Game ---
 const canvas = document.getElementById('turtle-canvas');
 const ctx = canvas.getContext('2d');
 let gameActive = false;
-let currentLevel = 0;
-
-const levels = [
-    { title: "Nivel 1: La Rutina", obstacles: ["Rutina", "Cansancio"], goal: 2000, msg: "Nada importante se construye en un día." },
-    { title: "Nivel 2: Los Desafíos", obstacles: ["Distancia", "Malentendidos"], goal: 2500, msg: "Entendernos toma esfuerzo, pero vale la pena." },
-    { title: "Nivel 3: El Cuidado", obstacles: ["Orgullo", "Tiempo"], goal: 3000, msg: "Lo que se cuida, crece." },
-    { title: "Nivel 4: Nuestro Futuro", obstacles: ["Dudas", "Miedos"], goal: 3500, msg: "Siempre elegiré avanzar hacia ti." }
-];
-
-let player = { x: 100, y: 300, w: 60, h: 30, dy: 0, speed: 5, jump: -12, grounded: false };
-let camera = { x: 0 };
-let worldObstacles = [];
+let currentLvl = 1;
+let player = { x: 50, y: 300, w: 40, h: 40, dy: 0, grounded: false, speed: 4 };
+let cameraX = 0;
+let obstacles = [];
 
 function initLevel() {
-    player.x = 100;
-    camera.x = 0;
-    worldObstacles = [];
-    const lvl = levels[currentLevel];
-    document.getElementById('level-title').textContent = lvl.title;
-
-    for (let i = 1; i < 10; i++) {
-        worldObstacles.push({
-            x: 500 * i,
-            y: 350,
-            text: lvl.obstacles[Math.floor(Math.random() * lvl.obstacles.length)],
-            w: 100, h: 40
-        });
+    player.x = 50; cameraX = 0;
+    obstacles = [];
+    const texts = currentLvl === 1 ? ["Rutina", "Tareas"] : ["Distancia", "Orgullo"];
+    for (let i = 0; i < 10; i++) {
+        obstacles.push({ x: 600 * (i + 1), y: 320, text: texts[Math.floor(Math.random() * texts.length)], w: 80, h: 80, active: true });
     }
 }
 
 function updateGame() {
     if (!gameActive) return;
-
-    // Movement
     if (keys.right) player.x += player.speed;
     if (keys.left) player.x -= player.speed;
-    if (keys.jump && player.grounded) {
-        player.dy = player.jump;
-        player.grounded = false;
-    }
+    if (keys.jump && player.grounded) { player.dy = -14; player.grounded = false; }
 
-    // Gravity
-    player.dy += 0.6;
+    player.dy += 0.7; // Gravity
     player.y += player.dy;
 
-    // Floor
-    if (player.y > 350) {
-        player.y = 350;
-        player.dy = 0;
-        player.grounded = true;
-    }
+    if (player.y > 300) { player.y = 300; player.dy = 0; player.grounded = true; }
 
-    // Camera
-    camera.x = player.x - 200;
+    cameraX = player.x - 150;
 
-    // Collisions
-    worldObstacles.forEach(obs => {
-        if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
-            player.y < obs.y + obs.h && player.y + player.h > obs.y) {
-            player.x = 100; // Reset level
+    obstacles.forEach(obs => {
+        if (!obs.active) return;
+        if (player.x < obs.x + obs.w && player.x + player.w > obs.x && player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+            if (player.dy > 0 && player.y < obs.y) { // Jump on top
+                obs.active = false;
+                player.dy = -10;
+            } else { player.x = 50; } // Die
         }
     });
 
-    // Check Win Level
-    if (player.x > levels[currentLevel].goal) {
-        showLevelMessage();
+    if (player.x > 6000) {
+        if (currentLvl < 3) { currentLvl++; initLevel(); } else { finishGame(); }
     }
-}
-
-function showLevelMessage() {
-    gameActive = false;
-    const msgEl = document.getElementById('level-msg');
-    msgEl.textContent = levels[currentLevel].msg;
-    msgEl.classList.remove('hidden');
-
-    setTimeout(() => {
-        msgEl.classList.add('hidden');
-        currentLevel++;
-        if (currentLevel < levels.length) {
-            initLevel();
-            gameActive = true;
-        } else {
-            finishGame();
-        }
-    }, 3000);
-}
-
-function finishGame() {
-    document.getElementById('game-canvas-section').classList.add('hidden');
-    document.getElementById('final-love-section').classList.remove('hidden');
-    document.body.classList.remove('playing-game');
 }
 
 function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Background (Blue)
+    ctx.fillStyle = "#87CEEB";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     ctx.save();
-    ctx.translate(-camera.x, 0);
+    ctx.translate(-cameraX, 0);
 
-    // Draw Floor
+    // Clouds
+    ctx.fillStyle = "white";
+    for (let i = 0; i < 20; i++) { ctx.beginPath(); ctx.arc(i * 400, 100, 30, 0, Math.PI * 2); ctx.fill(); }
+
+    // Floor
     ctx.fillStyle = "#556b2f";
-    ctx.fillRect(camera.x, 380, canvas.width, 200);
+    ctx.fillRect(cameraX, 340, canvas.width, 100);
 
-    // Draw Turtle (Side View)
-    ctx.fillStyle = "#90EE90"; // Body
-    ctx.beginPath();
-    ctx.ellipse(player.x + 30, player.y + 15, 30, 15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#228B22"; // Shell
-    ctx.beginPath();
-    ctx.ellipse(player.x + 25, player.y + 10, 25, 15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#90EE90"; // Head
-    ctx.beginPath();
-    ctx.arc(player.x + 60, player.y + 10, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Draw Obstacles
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    ctx.font = "16px Montserrat";
-    worldObstacles.forEach(obs => {
-        ctx.fillText(obs.text, obs.x, obs.y);
+    // Obstacles (Blocks/Enemies)
+    obstacles.forEach(obs => {
+        if (!obs.active) return;
+        ctx.fillStyle = "#641e16";
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        ctx.fillStyle = "white";
+        ctx.font = "14px Montserrat";
+        ctx.fillText(obs.text, obs.x + 5, obs.y + 45);
     });
 
-    // Goal
-    ctx.fillStyle = "#ff4d4d";
-    ctx.font = "40px Montserrat";
-    ctx.fillText("❤️", levels[currentLevel].goal, 350);
+    // Turtle (Side)
+    ctx.fillStyle = "#90EE90";
+    ctx.beginPath(); ctx.ellipse(player.x + 20, player.y + 25, 20, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#228B22";
+    ctx.beginPath(); ctx.ellipse(player.x + 15, player.y + 20, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
 
     ctx.restore();
     if (gameActive) requestAnimationFrame(drawGame);
 }
 
 const keys = { left: false, right: false, jump: false };
-document.getElementById('btn-left').ontouchstart = () => keys.left = true;
-document.getElementById('btn-left').ontouchend = () => keys.left = false;
-document.getElementById('btn-right').ontouchstart = () => keys.right = true;
-document.getElementById('btn-right').ontouchend = () => keys.right = false;
-document.getElementById('btn-jump').ontouchstart = () => keys.jump = true;
-document.getElementById('btn-jump').ontouchend = () => keys.jump = false;
+document.getElementById('btn-left').onpointerdown = () => keys.left = true;
+document.getElementById('btn-left').onpointerup = () => keys.left = false;
+document.getElementById('btn-right').onpointerdown = () => keys.right = true;
+document.getElementById('btn-right').onpointerup = () => keys.right = false;
+document.getElementById('btn-jump').onpointerdown = () => { keys.jump = true; setTimeout(() => keys.jump = false, 100); };
 
 document.getElementById('start-game-btn').onclick = () => {
     document.getElementById('game-canvas-section').classList.remove('hidden');
-    document.body.classList.add('playing-game');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     gameActive = true;
@@ -325,13 +278,15 @@ document.getElementById('start-game-btn').onclick = () => {
     setInterval(updateGame, 1000 / 60);
 };
 
-// Hearts Background
-setInterval(() => {
-    const h = document.createElement('div');
-    h.className = 'heart-particle';
-    h.innerHTML = '❤️';
-    h.style.left = Math.random() * 100 + 'vw';
-    h.style.setProperty('--randX', (Math.random() * 200 - 100) + 'px');
-    document.body.appendChild(h);
-    setTimeout(() => h.remove(), 4000);
-}, 1000);
+function finishGame() {
+    gameActive = false;
+    document.getElementById('game-canvas-section').classList.add('hidden');
+    alert("Te amo Citlalli. Siempre avanzaremos juntos.");
+}
+
+function revealSections() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section').forEach(s => observer.observe(s));
+}
