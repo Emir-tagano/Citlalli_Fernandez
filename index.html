@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Niña Hermosa - Citlalli</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Background Music (Audio will be started after interaction) -->
+    <audio id="bg-music" loop>
+        <!-- Placeholder for the song: Soñé - Zoé. 
+             Ideally the user has this file locally. I will look for it or use a public link if available. -->
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Initial Question Overlay -->
+    <div id="intro-overlay" class="overlay">
+        <div class="intro-card">
+            <h1 class="dancing-script">Hola, mi vida...</h1>
+            <p class="playfair">¿Quieres ser mi San Valentín?</p>
+            <div class="btn-container">
+                <button id="btn-yes" class="btn">¡Sí! ❤️</button>
+                <button id="btn-no" class="btn no-btn">No 💔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden initially) -->
+    <main id="main-content" class="hidden">
+        <!-- Section 1: Hero & Animated Bouquet -->
+        <section id="hero" class="section">
+            <div class="bouquet-container">
+                <!-- SVG Bouquet will be injected here via JS -->
+                <div id="flower-bouquet"></div>
+            </div>
+            <div class="hero-text">
+                <h2 class="dancing-script">Para Citlalli Fernandez Ventura</h2>
+                <p class="fade-in">Mi niña buena, a veces enojona, pero siempre mi amor.</p>
+            </div>
+            <div id="counter" class="counter-container">
+                <h3>Llevamos juntos:</h3>
+                <div class="timer">
+                    <div class="time-block"><span id="days">00</span><small>Días</small></div>
+                    <div class="time-block"><span id="hours">00</span><small>Horas</small></div>
+                    <div class="time-block"><span id="minutes">00</span><small>Minutos</small></div>
+                    <div class="time-block"><span id="seconds">00</span><small>Segundos</small></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Letter -->
+        <section id="letter-section" class="section">
+            <div class="letter-card">
+                <div id="typewriter" class="typewriter-text"></div>
+                <div class="scroll-trigger-messages">
+                    <!-- Messages will appear here as we scroll -->
+                    <div class="scroll-msg" data-img="20221115_135616.jpg">"Si pudiera elegir un lugar seguro, sería a
+                        tu lado."</div>
+                    <div class="scroll-msg" data-img="20230502_172836.jpg">"Te miro y me doy cuenta que jamás pensé que
+                        podría amar a alguien con tanta intensidad..."</div>
+                    <div class="scroll-msg" data-img="20240318_143855.jpg">"Encontré el amor y la calma que tanto
+                        necesitaba, y encontré mi hogar en unos brazos que desde hace tiempo anhelaba."</div>
+                    <div class="scroll-msg" data-img="20251116_160315.jpg">"A pesar de todo lo que hemos pasado y
+                        vivido, yo te seguiré amando siempre."</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Pictures Gallery (Dynamic) -->
+        <section id="gallery" class="section">
+            <h2 class="playfair">Nuestros Momentos</h2>
+            <div class="gallery-grid" id="image-gallery">
+                <!-- Images will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Section 3.5: Video Moment -->
+        <section id="video-section" class="section">
+            <h2 class="playfair">Un Recuerdo Especial</h2>
+            <div class="video-container">
+                <video controls width="100%" poster="Imagenes_Citla/20260108_203722.jpg">
+                    <source src="Imagenes_Citla/20260122_170710.mp4" type="video/mp4">
+                    Tu navegador no soporta videos.
+                </video>
+            </div>
+        </section>
+
+        <!-- Section 4: What I love about you -->
+        <section id="love-list" class="section">
+            <h2 class="dancing-script">Lo que amo de ti</h2>
+            <div class="love-cards">
+                <div class="love-card">Tu sonrisa que ilumina mi día.</div>
+                <div class="love-card">Tu forma de cuidar a los animales.</div>
+                <div class="love-card">Como te pones cuando te enojas (te ves tierna).</div>
+                <div class="love-card">Tu determinación y como nunca te rindes.</div>
+                <div class="love-card">Nuestros viajes y aventuras.</div>
+                <div class="love-card">Lo buena niña que eres conmigo.</div>
+            </div>
+        </section>
+
+        <!-- Section 5: The Gift Choice (Interactive Cards) -->
+        <section id="gift-section" class="section">
+            <h2 class="playfair">Elige tu Regalo (Solo uno...)</h2>
+            <div class="gift-grid" id="gift-grid">
+                <!-- 8 cards will be generated here -->
+            </div>
+            <div id="gift-reveal" class="hidden">
+                <h3>¡Has elegido!</h3>
+                <p id="selected-gift-text"></p>
+            </div>
+        </section>
+
+        <!-- Section 6: The Turtle Game -->
+        <section id="game-section" class="section">
+            <h2 class="dancing-script">Una pequeña historia...</h2>
+            <div class="game-intro">
+                <p id="game-story" class="playfair-italic"></p>
+                <button id="start-game-btn" class="btn">Comenzar</button>
+            </div>
+            <div id="game-container" class="hidden">
+                <canvas id="turtle-canvas"></canvas>
+                <div id="game-overlay" class="game-overlay hidden">
+                    <p id="game-msg"></p>
+                </div>
+            </div>
+            <div id="final-message" class="hidden">
+                <h2 class="dancing-script">Llegaste al corazón, igual que yo...</h2>
+                <p class="playfair">Te amo Citlalli. Por muchos años más.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Con todo mi amor</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

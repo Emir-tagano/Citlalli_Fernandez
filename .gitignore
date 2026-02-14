@@ -1,0 +1,5 @@
+# Ignorar imágenes y videos personales para no saturar el repo
+# Si el usuario quiere subirlos, puede comentar estas líneas
+# Imagenes_Citla/
+node_modules/
+.DS_Store
